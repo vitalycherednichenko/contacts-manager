@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ContactsApp}",
+            "name": "Debug ContactsApp",
+            "program": "${workspaceFolder:ContactsApp}/.build/debug/ContactsApp",
+            "preLaunchTask": "swift: Build Debug ContactsApp"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ContactsApp}",
+            "name": "Release ContactsApp",
+            "program": "${workspaceFolder:ContactsApp}/.build/release/ContactsApp",
+            "preLaunchTask": "swift: Build Release ContactsApp"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import Foundation
 
-class ContactsFileManager {
+class ContactsFileController {
     private(set) var fileURL: URL
     
     init() {

@@ -2,10 +2,33 @@ import Darwin
 import Foundation
 
 class ConsoleInterface {
-    private let contactManager: ContactManager
+    private let contactManager: ContactController
     
     init() {
-        self.contactManager = ContactManager()
+        self.contactManager = ContactController()
+    }
+    
+    private func getAppVersion() -> String {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+        process.arguments = ["describe", "--tags", "--abbrev=0"]
+        
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if let data = try? pipe.fileHandleForReading.readToEnd(),
+               let version = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                return version
+            }
+        } catch {
+            print("Ошибка при получении версии: \(error)")
+        }
+        
+        return "1.0"
     }
     
     func run() {
@@ -36,9 +59,10 @@ class ConsoleInterface {
     
     private func displayMenu() {
         clearScreen()
+        let version = getAppVersion()
         print("""
         \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-        ║                📱 Контакты людей v1.0                ║
+        ║                📱 Контакты людей \(version)              ║
         ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
         
         \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)

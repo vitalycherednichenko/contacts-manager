@@ -1,11 +1,11 @@
 import Foundation
 
-class ContactManager {
+class ContactController {
     private var contacts: [Contact]
     private var idCounter: Int
-    private let fileManager: ContactsFileManager
+    private let fileManager: ContactsFileController
     
-    init(fileManager: ContactsFileManager = ContactsFileManager()) {
+    init(fileManager: ContactsFileController = ContactsFileController()) {
         self.fileManager = fileManager
         if let savedContacts = fileManager.loadContacts() {
             contacts = savedContacts
@@ -52,4 +52,4 @@ class ContactManager {
     func getAllContacts() -> [Contact] {
         return contacts
     }
-} 
+}

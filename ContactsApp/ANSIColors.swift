@@ -8,4 +8,4 @@ enum ANSIColors {
     static let yellow = "\u{001B}[33m"
     static let red = "\u{001B}[31m"
     static let blue = "\u{001B}[34m"
-} 
+}

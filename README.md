@@ -6,11 +6,15 @@ This is a Swift console application for managing a contact list. The application
 
 - macOS 10.15 or higher / Linux (Ubuntu 20.04 or higher)
 - Swift 5.0 or higher
-- Xcode 12.0 or higher (optional, macOS only)
 
 ## Installation and Running
 
-### Method 1: Via Terminal
+### Installing Swift
+
+To install Swift on your operating system, follow the official documentation:
+[Swift Installation](https://www.swift.org/install/macos/)
+
+### Build the project
 
 1. Clone the repository:
 ```bash
@@ -25,17 +29,6 @@ cd ContactsApp
 ```bash
 ./ContactsApp
 ```
-
-### Method 2: Via Xcode (macOS only)
-
-1. Open `CLProject.xcodeproj` in Xcode
-2. Select the "ContactsApp" scheme
-3. Click the "Run" button (▶️) or use the keyboard shortcut `Cmd + R`
-
-### Installing Swift
-
-To install Swift on your operating system, follow the official documentation:
-[Swift Installation](https://www.swift.org/install/macos/)
 
 ## Usage
 
