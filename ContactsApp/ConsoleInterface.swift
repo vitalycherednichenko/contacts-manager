@@ -17,13 +17,15 @@ class ConsoleInterface {
                 case 1: addContact()
                 case 2: showAllContacts()
                 case 6:
-                    print("До свидания!\n")
+                    print("\(ANSIColors.green)\(ANSIColors.bold)До свидания! Спасибо за использование нашего приложения! 👋\(ANSIColors.reset)\n")
                     return
                 default:
-                    print("Неверный выбор. Попробуйте снова.")
+                    print("\(ANSIColors.red)⚠️ Неверный выбор. Попробуйте снова.\(ANSIColors.reset)")
+                    sleep(1)
                 }
             } else {
-                print("\nНеверный выбор. Попробуйте снова.")
+                print("\(ANSIColors.red)⚠️ Неверный выбор. Попробуйте снова.\(ANSIColors.reset)")
+                sleep(1)
             }
         }
     }
@@ -35,28 +37,30 @@ class ConsoleInterface {
     private func displayMenu() {
         clearScreen()
         print("""
-        \n==== Добро пожаловать в приложение "Контакты людей" ====!
+        \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
+        ║                📱 Контакты людей v1.0                ║
+        ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
         
-        Выберите действие:
+        \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
         
-        1. Добавить контакт
-        2. Просмотреть все контакты
-        6. Выход
+        \(ANSIColors.green)1. 📝 Добавить новый контакт
+        2. 👥 Просмотреть все контакты
+        6. 🚪 Выход\(ANSIColors.reset)
         
-        Ваш выбор: 
+        \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
         """, terminator: "")
     }
     
     private func inputString(prompt: String, allowEmpty: Bool = false) -> String {
         while true {
-            print(prompt, terminator: "")
+            print("\(ANSIColors.cyan)\(prompt)\(ANSIColors.reset)", terminator: "")
             if let input = readLine()?.trimmingCharacters(in: .whitespaces) {
                 if allowEmpty || !input.isEmpty {
                     return input
                 }
             }
             if !allowEmpty {
-                print("Ввод не может быть пустым. Попробуйте снова")
+                print("\(ANSIColors.red)⚠️ Ввод не может быть пустым. Попробуйте снова\(ANSIColors.reset)")
                 sleep(1)
             } else {
                 return ""
@@ -65,17 +69,20 @@ class ConsoleInterface {
     }
     
     private func waitForEnter() {
-        sleep(2)
-        print("\nНажмите Enter для продолжения...", terminator: "")
+        sleep(1)
+        print("\n\(ANSIColors.yellow)Нажмите Enter для продолжения...\(ANSIColors.reset)", terminator: "")
         _ = readLine()
     }
     
     private func addContact() {
-        let firstName = inputString(prompt: "Введите имя: ")
-        let middlename = inputString(prompt: "Введите отчество (или Enter, чтобы пропустить): ", allowEmpty: true)
-        let surname = inputString(prompt: "Введите фамилию: ")
-        let phone = inputString(prompt: "Введите телефон (или Enter, чтобы пропустить): ", allowEmpty: true)
-        let note = inputString(prompt: "Введите заметку (или Enter, чтобы пропустить): ", allowEmpty: true)
+        print("\(ANSIColors.green)\(ANSIColors.bold)📝 Создание нового контакта\(ANSIColors.reset)")
+        print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
+        
+        let firstName = inputString(prompt: "👤 Имя: ")
+        let middlename = inputString(prompt: "👤 Отчество (или Enter, чтобы пропустить): ", allowEmpty: true)
+        let surname = inputString(prompt: "👤 Фамилия: ")
+        let phone = inputString(prompt: "📱 Телефон (или Enter, чтобы пропустить): ", allowEmpty: true)
+        let note = inputString(prompt: "📝 Заметка (или Enter, чтобы пропустить): ", allowEmpty: true)
         
         let personalInfo = [
             "name": firstName,
@@ -92,18 +99,24 @@ class ConsoleInterface {
         }
         
         let contact = contactManager.createContact(personalInfo: personalInfo, additionalInfo: additionalInfo)
-        print("Контакт успешно создан:", contact.toStr())
+        print("\n\(ANSIColors.green)✅ Контакт успешно создан:\(ANSIColors.reset)")
+        print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
+        print(contact.toStr())
         waitForEnter()
     }
     
     private func showAllContacts() {
         let contacts = contactManager.getAllContacts()
+        print("\(ANSIColors.green)\(ANSIColors.bold)👥 Список контактов\(ANSIColors.reset)")
+        print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
+        
         if contacts.isEmpty {
-            print("Список контактов пуст.")
+            print("\(ANSIColors.yellow)📭 Список контактов пуст.\(ANSIColors.reset)")
         } else {
-            print("Список контактов:")
             for contact in contacts {
-                print("id \(contact.id): ", contact.toStr())
+                print("\(ANSIColors.cyan)ID \(contact.id):\(ANSIColors.reset)")
+                print(contact.toStr())
+                print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
             }
         }
         waitForEnter()

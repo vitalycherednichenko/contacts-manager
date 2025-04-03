@@ -29,7 +29,7 @@ cd ContactsApp
 ### Method 2: Via Xcode (macOS only)
 
 1. Open `CLProject.xcodeproj` in Xcode
-2. Select the "CLProject" scheme
+2. Select the "ContactsApp" scheme
 3. Click the "Run" button (▶️) or use the keyboard shortcut `Cmd + R`
 
 ### Installing Swift
