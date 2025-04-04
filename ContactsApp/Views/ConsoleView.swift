@@ -8,11 +8,6 @@
 import Foundation
 
 class ConsoleView {
-    private let message: MessageView
-    
-    init () {
-        self.message = MessageView()
-    }
     
     public func inputString(prompt: String, required: Bool = false) -> String? {
         while true {
@@ -27,11 +22,34 @@ class ConsoleView {
             }
             
             if input.isEmpty, required {
-                message.displayError("Поле не может быть пустым. Попробуйте снова")
+                displayError("Поле не может быть пустым. Попробуйте снова")
                 continue
             }
             
             return input
         }
+    }
+    
+    func displayError(_ message: String) {
+        print("\n\(ANSIColors.red)⚠️  \(message)\(ANSIColors.reset)")
+        sleep(1)
+    }
+    
+    func displaySuccess(_ message: String, description: String? = nil) {
+        print("\n\(ANSIColors.green)✅ \(message)\(ANSIColors.reset)")
+        if let description = description {
+            print("\n\(description)")
+        }
+        sleep(1)
+    }
+    
+    func displayInfo(_ message: String) {
+        sleep(1)
+        print("\n\(ANSIColors.yellow)ℹ️  \(message) \(ANSIColors.reset)", terminator: "")
+        _ = readLine()
+    }
+    
+    public func clearScreen() {
+        print("\u{001B}[2J\u{001B}[H")
     }
 }

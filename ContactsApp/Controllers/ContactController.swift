@@ -1,11 +1,20 @@
 import Foundation
 
-class ContactController {
+protocol ContactPresenterProtocol {
+    func createContact() -> Contact?
+    func getAllContacts() -> [Contact]
+    func deleteContact(id: Int) -> Bool
+}
+
+
+class ContactController: ContactPresenterProtocol {
     private var contacts: [Contact]
+    private let consoleView: ConsoleView
     private var idCounter: Int
     private let fileManager: ContactsFileController
     
     init(fileManager: ContactsFileController = ContactsFileController()) {
+        self.consoleView = ConsoleView()
         self.fileManager = fileManager
         if let savedContacts = fileManager.loadContacts() {
             contacts = savedContacts
@@ -16,12 +25,22 @@ class ContactController {
         }
     }
     
-    func createContact(personalInfo: PersonalInfo, additionalInfo: [String: String] = [:]) -> Contact {
+    public func createContact() -> Contact? {
+        guard let firstName = consoleView.inputString(prompt: "👤 *Имя: ", required: true) else { return nil }
+        guard let middlename = consoleView.inputString(prompt: "👤 Отчество: ") else { return nil }
+        guard let surname = consoleView.inputString(prompt: "👤 *Фамилия: ", required: true) else { return nil }
+        guard let phone = consoleView.inputString(prompt: "📱 Телефон: ") else { return nil }
+        guard let note = consoleView.inputString(prompt: "📝 Заметка: ") else { return nil }
+        
+        let personalInfo = PersonalInfo(
+            name: firstName,
+            surname: surname,
+            middlename: middlename
+        )
+        
         idCounter += 1
         
-        let connects = ConnectsInfo(phone: additionalInfo["phone"] ?? "")
-        
-        let note = additionalInfo["note"]
+        let connects = ConnectsInfo(phone: phone)
         
         let contact = Contact(
             id: idCounter,
@@ -32,6 +51,7 @@ class ContactController {
         
         contacts.append(contact)
         try? fileManager.saveContacts(contacts)
+        
         return contact
     }
     

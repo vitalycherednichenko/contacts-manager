@@ -1,13 +1,30 @@
 import Foundation
 
-protocol MenuViewProtocol {
-    func showMainMenu() -> String?
+protocol MainMenuViewProtocol {
+    func run()
+    func showMainMenu()
 }
 
-class MenuView: MenuViewProtocol {
+class MainMenuView: MainMenuViewProtocol {
+    let presenter: MainMenuPresenterProtocol
+    let consoleView: ConsoleView
+    let router: RouterProtocol
     
-    func showMainMenu() -> String? {
-        clearScreen()
+    init(router: RouterProtocol) {
+        self.router = router
+        self.consoleView = ConsoleView()
+        self.presenter = MainMenuController()
+    }
+    
+    func run () {
+        showMainMenu()
+        if let input = readLine() {
+            handleInput(input)
+        }
+    }
+    
+    func showMainMenu() {
+        consoleView.clearScreen()
         let version = getAppVersion()
         print("""
                 \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
@@ -16,15 +33,31 @@ class MenuView: MenuViewProtocol {
                 
                 \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
                 
-                \(ANSIColors.green)1. 📝 Добавить новый контакт
-                2. 👥 Просмотреть все контакты
-                3. 🗑️  Удалить контакт
-                6. 🚪 Выход\(ANSIColors.reset)
+                \(ANSIColors.green)1. 📞 Контакты
+                
+                2. 👤 Ваш профиль
+                
+                3. ⚙️  Настройки
+                
+                4. 🚪 Выход\(ANSIColors.reset)
                 
                 \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
                 """, terminator: "")
+    }
+    
+    func handleInput(_ input: String) {
+        switch input {
+        case "1": router.showContactsMenu()
+        case "2": router.showProfileMenu()
+        case "3": router.showSettingsMenu()
+        case "4":
+            consoleView.displaySuccess("До свидания! Спасибо за использование нашего приложения! 👋")
+            exit(0)
+        default:
+            consoleView.displayError("Неверный выбор. Попробуйте снова.")
+        }
         
-        return readLine()
+        run()
     }
 
     private func getAppVersion() -> String {
@@ -48,9 +81,5 @@ class MenuView: MenuViewProtocol {
         }
         
         return "1.0"
-    }
-    
-    private func clearScreen() {
-        print("\u{001B}[2J\u{001B}[H")
     }
 }

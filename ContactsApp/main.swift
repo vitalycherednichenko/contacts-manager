@@ -1,4 +1,4 @@
 import Foundation
 
-let interface = ConsoleController()
-interface.run()
+let router = Router()
+router.showMainMenu()
