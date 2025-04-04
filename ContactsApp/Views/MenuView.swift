@@ -11,13 +11,14 @@ class MenuView: MenuViewProtocol {
         let version = getAppVersion()
         print("""
                 \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-                ║                📱 Контакты людей \(version)              ║
+                ║                📱 Контакты людей \(version)                    ║
                 ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
                 
                 \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
                 
                 \(ANSIColors.green)1. 📝 Добавить новый контакт
                 2. 👥 Просмотреть все контакты
+                3. 🗑️  Удалить контакт
                 6. 🚪 Выход\(ANSIColors.reset)
                 
                 \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)

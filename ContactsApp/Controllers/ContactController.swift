@@ -43,4 +43,14 @@ class ContactController {
     func getAllContacts() -> [Contact] {
         return contacts
     }
+    
+    func deleteContact(id: Int) -> Bool {
+        guard let index = contacts.firstIndex(where: { $0.id == id }) else {
+            return false
+        }
+        
+        contacts.remove(at: index)
+        try? fileManager.saveContacts(contacts)
+        return true
+    }
 }

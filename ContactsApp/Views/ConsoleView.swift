@@ -27,7 +27,7 @@ class ConsoleView {
             }
             
             if input.isEmpty, required {
-                message.displayError("Ввод не может быть пустым. Попробуйте снова")
+                message.displayError("Поле не может быть пустым. Попробуйте снова")
                 continue
             }
             

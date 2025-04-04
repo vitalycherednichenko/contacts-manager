@@ -1,4 +1,4 @@
-# Console Contact Management Application
+# Console Contacts Management Application
 
 This is a Swift console application for managing a contact list. The application allows you to view and save contacts to a JSON file.
 
