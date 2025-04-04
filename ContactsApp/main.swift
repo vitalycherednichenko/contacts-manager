@@ -1,4 +1,4 @@
 import Foundation
 
-let interface = ConsoleInterface()
-interface.run() 
+let interface = ConsoleController()
+interface.run()

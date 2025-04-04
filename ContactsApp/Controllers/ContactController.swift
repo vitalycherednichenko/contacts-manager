@@ -16,25 +16,16 @@ class ContactController {
         }
     }
     
-    func createContact(personalInfo: [String: String], additionalInfo: [String: String] = [:]) -> Contact {
+    func createContact(personalInfo: PersonalInfo, additionalInfo: [String: String] = [:]) -> Contact {
         idCounter += 1
         
-        // Создаем PersonalInfo из словаря
-        let info = PersonalInfo(
-            name: personalInfo["name"] ?? "",
-            surname: personalInfo["surname"] ?? "",
-            middlename: personalInfo["middlename"] ?? ""
-        )
-        
-        // Создаем ContactInfo с телефоном
         let connects = ConnectsInfo(phone: additionalInfo["phone"] ?? "")
         
-        // Создаем контакт с заметкой из additionalInfo
         let note = additionalInfo["note"]
         
         let contact = Contact(
             id: idCounter,
-            personalInfo: info,
+            personalInfo: personalInfo,
             connects: connects,
             note: note
         )

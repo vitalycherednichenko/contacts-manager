@@ -16,13 +16,7 @@ let package = Package(
         .executableTarget(
             name: "ContactsApp",
             dependencies: [],
-            path: "ContactsApp",
-            exclude: ["build.sh"],
-            resources: [
-                .process("contacts.json"),
-                .process("build.sh"),
-                .process("ContactsApp")
-            ]
+            path: "ContactsApp"
         )
     ]
 ) 

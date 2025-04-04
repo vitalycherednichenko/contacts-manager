@@ -58,5 +58,5 @@ injectionforxcode/
 *.swp
 *.swo
 *~ 
-ContactsApp/contacts.json
-ContactsApp/ContactsApp
+contacts.json
+ContactsMannager

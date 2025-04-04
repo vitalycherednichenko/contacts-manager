@@ -15,9 +15,9 @@ struct Contact: Codable {
 
     func toStr() -> String {
         var result = """
-        
+        \(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)
         \(ANSIColors.cyan)\(ANSIColors.bold)👤 Контактная информация:\(ANSIColors.reset)
-        \(ANSIColors.blue)📛 ФИО: \(ANSIColors.reset)\(personalInfo.surname) \(personalInfo.name)
+        \(ANSIColors.cyan)📛 ФИО: \(ANSIColors.reset)\(personalInfo.surname) \(personalInfo.name)
         """
         
         if !personalInfo.middlename.isEmpty {
@@ -25,14 +25,14 @@ struct Contact: Codable {
         }
         
         if let phone = connects.phone {
-            result += "\n\(ANSIColors.blue)📱 Телефон: \(ANSIColors.reset)\(phone)"
+            result += "\n\(ANSIColors.cyan)📱 Телефон: \(ANSIColors.reset)\(phone)"
         }
         
         if let note = note {
-            result += "\n\(ANSIColors.blue)📝 Заметка: \(ANSIColors.reset)\(note)"
+            result += "\n\(ANSIColors.cyan)📝 Заметка: \(ANSIColors.reset)\(note)"
         }
         
-        result += "\n\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)"
+        result += "\n\(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)"
         return result
     }
 } 

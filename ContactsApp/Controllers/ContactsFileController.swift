@@ -4,7 +4,6 @@ class ContactsFileController {
     private(set) var fileURL: URL
     
     init() {
-        // Используем текущую директорию для файла contacts.json
         fileURL = URL(fileURLWithPath: "contacts.json", relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
         print("Файл контактов: \(fileURL.path)")
     }

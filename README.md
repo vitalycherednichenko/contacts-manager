@@ -27,7 +27,7 @@ cd ContactsApp
 ```
 3. Run the application:
 ```bash
-./ContactsApp
+./ContactsMannager
 ```
 
 ## Usage
