@@ -14,19 +14,24 @@ class ConsoleView {
         self.message = MessageView()
     }
     
-    public func inputString(prompt: String, allowEmpty: Bool = false) -> String {
+    public func inputString(prompt: String, required: Bool = false) -> String? {
         while true {
             print("\(ANSIColors.cyan)\(prompt)\(ANSIColors.reset)", terminator: "")
-            if let input = readLine()?.trimmingCharacters(in: .whitespaces) {
-                if allowEmpty || !input.isEmpty {
-                    return input
-                }
+            
+            guard let input = readLine()?.trimmingCharacters(in: .whitespaces) else {
+                continue
             }
-            if !allowEmpty {
+            
+            if input.lowercased() == "q" {
+                return nil
+            }
+            
+            if input.isEmpty, required {
                 message.displayError("Ввод не может быть пустым. Попробуйте снова")
-            } else {
-                return ""
+                continue
             }
+            
+            return input
         }
     }
 }

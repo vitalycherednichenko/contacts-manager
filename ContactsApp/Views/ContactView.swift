@@ -31,6 +31,10 @@ class ContactView {
     
     func showCreateContact () {
         print("\(ANSIColors.green)\(ANSIColors.bold)📝 Создание нового контакта\(ANSIColors.reset)")
-        print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
+        sleep(1)
+        print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)", terminator: "")
+        print("\n\(ANSIColors.yellow)✳️  Обязательное поле отмечено * \(ANSIColors.reset)", terminator: "")
+        print("\n\(ANSIColors.yellow)ℹ️  Нажмите Enter, чтобы пропустить заполнение поля \(ANSIColors.reset)", terminator: "")
+        print("\n\(ANSIColors.yellow)──────────────────────────────────────────────────────\(ANSIColors.reset)")
     }
 }

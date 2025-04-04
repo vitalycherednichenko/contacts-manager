@@ -38,11 +38,15 @@ class ConsoleController {
     private func addContact() {
         contactView.showCreateContact()
         
-        let firstName = consoleView.inputString(prompt: "👤 Имя: ")
-        let middlename = consoleView.inputString(prompt: "👤 Отчество (или Enter, чтобы пропустить): ", allowEmpty: true)
-        let surname = consoleView.inputString(prompt: "👤 Фамилия: ")
-        let phone = consoleView.inputString(prompt: "📱 Телефон (или Enter, чтобы пропустить): ", allowEmpty: true)
-        let note = consoleView.inputString(prompt: "📝 Заметка (или Enter, чтобы пропустить): ", allowEmpty: true)
+        guard let firstName = consoleView.inputString(prompt: "👤 *Имя: ", required: true) else { return }
+        
+        guard let middlename = consoleView.inputString(prompt: "👤 Отчество: ") else { return }
+        
+        guard let surname = consoleView.inputString(prompt: "👤 *Фамилия: ", required: true) else { return }
+        
+        guard let phone = consoleView.inputString(prompt: "📱 Телефон: ") else { return }
+        
+        guard let note = consoleView.inputString(prompt: "📝 Заметка: ") else { return }
         
         let personalInfo = PersonalInfo(
             name: firstName,

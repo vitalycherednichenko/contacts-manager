@@ -16,7 +16,7 @@ protocol MessageViewProtocol {
 class MessageView {
     
     func displayError(_ message: String) {
-        print("\n\(ANSIColors.red)⚠️ \(message)\(ANSIColors.reset)")
+        print("\n\(ANSIColors.red)⚠️  \(message)\(ANSIColors.reset)")
         sleep(1)
     }
     
