@@ -4,16 +4,17 @@ protocol ContactPresenterProtocol {
     func createContact() -> Contact?
     func getAllContacts() -> [Contact]
     func deleteContact(id: Int) -> Bool
+    func editContact(id: Int, updatedContact: Contact) -> Bool
 }
 
 
-class ContactController: ContactPresenterProtocol {
+class ContactPresenter: ContactPresenterProtocol {
     private var contacts: [Contact]
     private let consoleView: ConsoleView
     private var idCounter: Int
-    private let fileManager: ContactsFileController
+    private let fileManager: FileInteractor
     
-    init(fileManager: ContactsFileController = ContactsFileController()) {
+    init(fileManager: FileInteractor = FileInteractor()) {
         self.consoleView = ConsoleView()
         self.fileManager = fileManager
         if let savedContacts = fileManager.loadContacts() {
@@ -70,6 +71,16 @@ class ContactController: ContactPresenterProtocol {
         }
         
         contacts.remove(at: index)
+        try? fileManager.saveContacts(contacts)
+        return true
+    }
+    
+    func editContact(id: Int, updatedContact: Contact) -> Bool {
+        guard let index = contacts.firstIndex(where: { $0.id == id }) else {
+            return false
+        }
+        
+        contacts[index] = updatedContact
         try? fileManager.saveContacts(contacts)
         return true
     }

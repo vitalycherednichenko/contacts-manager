@@ -13,7 +13,7 @@ class MainMenuView: MainMenuViewProtocol {
     init(router: RouterProtocol) {
         self.router = router
         self.consoleView = ConsoleView()
-        self.presenter = MainMenuController()
+        self.presenter = MainMenuPresenter()
     }
     
     func run () {

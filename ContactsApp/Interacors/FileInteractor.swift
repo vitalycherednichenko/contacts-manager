@@ -1,6 +1,6 @@
 import Foundation
 
-class ContactsFileController {
+class FileInteractor {
     private(set) var fileURL: URL
     
     init() {
