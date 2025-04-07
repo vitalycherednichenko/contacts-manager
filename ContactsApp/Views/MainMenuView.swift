@@ -1,14 +1,14 @@
 import Foundation
 
 protocol MainMenuViewProtocol {
-    func run()
     func showMainMenu()
+    func getAppVersion() -> String
 }
 
-class MainMenuView: MainMenuViewProtocol {
-    let presenter: MainMenuPresenterProtocol
-    let consoleView: ConsoleView
-    let router: RouterProtocol
+class MainMenuView: ViewProtocol, MenuViewProtocol, MainMenuViewProtocol  {
+    private let presenter: MainMenuPresenterProtocol
+    private let consoleView: ConsoleView
+    private let router: RouterProtocol
     
     init(router: RouterProtocol) {
         self.router = router
@@ -23,7 +23,7 @@ class MainMenuView: MainMenuViewProtocol {
         }
     }
     
-    func showMainMenu() {
+    public func showMainMenu() {
         consoleView.clearScreen()
         let version = getAppVersion()
         print("""
@@ -45,7 +45,7 @@ class MainMenuView: MainMenuViewProtocol {
                 """, terminator: "")
     }
     
-    func handleInput(_ input: String) {
+    public func handleInput(_ input: String) {
         switch input {
         case "1": router.showContactsMenu()
         case "2": router.showProfileMenu()
@@ -60,7 +60,7 @@ class MainMenuView: MainMenuViewProtocol {
         run()
     }
 
-    private func getAppVersion() -> String {
+    public func getAppVersion() -> String {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
         process.arguments = ["describe", "--tags", "--abbrev=0"]

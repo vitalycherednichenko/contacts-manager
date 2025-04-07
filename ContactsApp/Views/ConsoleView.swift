@@ -7,7 +7,14 @@
 
 import Foundation
 
-class ConsoleView {
+protocol ConsoleViewProtocol {
+    func inputString(prompt: String, required: Bool) -> String?
+    func displayError(_ message: String)
+    func displaySuccess(_ message: String, description: String?)
+    func displayInfo(_ message: String)
+}
+
+class ConsoleView: ConsoleViewProtocol {
     
     public func inputString(prompt: String, required: Bool = false) -> String? {
         while true {
@@ -30,12 +37,12 @@ class ConsoleView {
         }
     }
     
-    func displayError(_ message: String) {
+    public func displayError(_ message: String) {
         print("\n\(ANSIColors.red)⚠️  \(message)\(ANSIColors.reset)")
         sleep(1)
     }
     
-    func displaySuccess(_ message: String, description: String? = nil) {
+    public func displaySuccess(_ message: String, description: String? = nil) {
         print("\n\(ANSIColors.green)✅ \(message)\(ANSIColors.reset)")
         if let description = description {
             print("\n\(description)")
@@ -43,7 +50,7 @@ class ConsoleView {
         sleep(1)
     }
     
-    func displayInfo(_ message: String) {
+    public func displayInfo(_ message: String) {
         sleep(1)
         print("\n\(ANSIColors.yellow)ℹ️  \(message) \(ANSIColors.reset)", terminator: "")
         _ = readLine()

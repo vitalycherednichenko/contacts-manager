@@ -1,8 +1,8 @@
 import Foundation
 
 protocol ContactPresenterProtocol {
-    func createContact() -> Contact?
     func getAllContacts() -> [Contact]
+    func createContact() -> Contact?
     func deleteContact(id: Int) -> Bool
     func editContact(id: Int, updatedContact: Contact) -> Bool
 }
@@ -24,6 +24,10 @@ class ContactPresenter: ContactPresenterProtocol {
             contacts = []
             idCounter = 0
         }
+    }
+    
+    func getAllContacts() -> [Contact] {
+        return contacts
     }
     
     public func createContact() -> Contact? {
@@ -56,31 +60,22 @@ class ContactPresenter: ContactPresenterProtocol {
         return contact
     }
     
-    func addContact(_ contact: Contact) -> Bool {
-        contacts.append(contact)
-        return true
-    }
-    
-    func getAllContacts() -> [Contact] {
-        return contacts
-    }
-    
-    func deleteContact(id: Int) -> Bool {
-        guard let index = contacts.firstIndex(where: { $0.id == id }) else {
-            return false
-        }
-        
-        contacts.remove(at: index)
-        try? fileManager.saveContacts(contacts)
-        return true
-    }
-    
-    func editContact(id: Int, updatedContact: Contact) -> Bool {
+    public func editContact(id: Int, updatedContact: Contact) -> Bool {
         guard let index = contacts.firstIndex(where: { $0.id == id }) else {
             return false
         }
         
         contacts[index] = updatedContact
+        try? fileManager.saveContacts(contacts)
+        return true
+    }
+    
+    public func deleteContact(id: Int) -> Bool {
+        guard let index = contacts.firstIndex(where: { $0.id == id }) else {
+            return false
+        }
+        
+        contacts.remove(at: index)
         try? fileManager.saveContacts(contacts)
         return true
     }

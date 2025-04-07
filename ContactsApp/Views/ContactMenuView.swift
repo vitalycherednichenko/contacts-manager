@@ -7,11 +7,16 @@
 
 import Foundation
 
-protocol ContactsMenuViewProtocol {
-    func run()
+protocol ContactMenuViewProtocol {
+    func showContactsMenu()
+    func showAllContacts(_ contacts: [Contact])
+    func showCreateContact()
+    func showEditContact (_ contacts: [Contact])
+    func editContact(_ id: Int) -> Contact?
+    func searchContacts(_ query: String, contacts: [Contact]) -> [Contact]
 }
 
-class ContactsMenuView {
+class ContactsMenuView: ViewProtocol, MenuViewProtocol, ContactMenuViewProtocol {
     private let presenter: ContactPresenterProtocol
     private let consoleView: ConsoleView
     private let router: RouterProtocol
@@ -22,14 +27,14 @@ class ContactsMenuView {
         self.router = router
     }
     
-    func run () {
+    public func run () {
         showContactsMenu()
         if let input = readLine() {
             handleInput(input)
         }
     }
     
-    func showContactsMenu() {
+    public func showContactsMenu() {
         consoleView.clearScreen()
         print("""
                 \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
@@ -42,17 +47,19 @@ class ContactsMenuView {
                 
                 2. 👥 Просмотреть все контакты
                 
-                3. ✏️  Редактировать контакт
+                3. 🔍 Поиск контактов
                 
-                4. 🗑️  Удалить контакт
+                4. ✏️  Редактировать контакт
                 
-                5. ◀️  Назад в главное меню \(ANSIColors.reset)
+                5. 🗑️  Удалить контакт
+                
+                6. ◀️  Назад в главное меню \(ANSIColors.reset)
                 
                 \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
                 """, terminator: "")
     }
     
-    func handleInput(_ input: String) {
+    public func handleInput(_ input: String) {
         switch input {
         case "1":
             showCreateContact()
@@ -61,60 +68,22 @@ class ContactsMenuView {
                 consoleView.displayInfo("Нажмите Enter для продолжения...")
             }
         case "2": showAllContacts(presenter.getAllContacts())
-        case "3":
-            let contacts = presenter.getAllContacts()
-            if contacts.isEmpty {
-                consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
-                break
-            }
-            showEditContact(contacts)
-            
-            guard let idString = consoleView.inputString(prompt: "\nВведите ID контакта для редактирования: ", required: true) else { break }
-            
-            if idString.lowercased() == "q" { break }
-            
-            guard let id = Int(idString) else {
-                consoleView.displayError("Неверный ID. Должно быть число.")
-                consoleView.displayInfo("Нажмите Enter для продолжения...")
-                return
-            }
-            
-            if let editedContact = editContact(id) {
-                if presenter.editContact(id: id, updatedContact: editedContact) {
-                    consoleView.displaySuccess("Контакт с ID \(id) успешно отредактирован")
-                } else {
-                    consoleView.displayError("Не удалось отредактировать контакт с ID \(id)")
-                }
-            }
-            
-            consoleView.displayInfo("Нажмите Enter для продолжения...")
+        case "3": showSearchContacts()
         case "4":
             let contacts = presenter.getAllContacts()
             if contacts.isEmpty {
                 consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
                 break
             }
-            showDeleteContact(contacts)
-            
-            guard let idString = consoleView.inputString(prompt: "\nВведите ID контакта для удаления: ", required: true) else { break }
-            
-            if idString.lowercased() == "q" { break }
-            
-            guard let id = Int(idString) else {
-                consoleView.displayError("Неверный ID. Должно быть число.")
-                consoleView.displayInfo("Нажмите Enter для продолжения...")
-                return
-            } // todo Заменить на inputNumber
-            
-            if presenter.deleteContact(id: id) {
-                consoleView.displaySuccess("Контакт с ID \(id) успешно удален")
-            } else {
-                consoleView.displayError("Контакт с ID \(id) не найден")
+            showEditContactWithSearch(contacts)
+        case "5":
+            let contacts = presenter.getAllContacts()
+            if contacts.isEmpty {
+                consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
+                break
             }
-            
-            consoleView.displayInfo("Нажмите Enter для продолжения...")
-            
-        case "5": router.showMainMenu()
+            showDeleteContactWithSearch(contacts)
+        case "6": router.showMainMenu()
         default:
             consoleView.displayError("Неверный выбор. Попробуйте снова.")
         }
@@ -136,7 +105,7 @@ class ContactsMenuView {
         consoleView.displayInfo("Нажмите Enter для продолжения...")
     }
     
-    func showCreateContact () {
+    public func showCreateContact() {
         print("\(ANSIColors.green)\(ANSIColors.bold)📝 Создание нового контакта\(ANSIColors.reset)")
         sleep(1)
         print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)", terminator: "")
@@ -161,7 +130,7 @@ class ContactsMenuView {
         sleep(1)
     }
     
-    func showEditContact (_ contacts: [Contact]) {
+    public func showEditContact (_ contacts: [Contact]) {
         print("\n\(ANSIColors.green)\(ANSIColors.bold)✏️ Редактирование контакта\(ANSIColors.reset)")
         print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)", terminator: "")
         print("\n\(ANSIColors.yellow)──────────────────────────────────────────────\(ANSIColors.reset)")
@@ -177,7 +146,7 @@ class ContactsMenuView {
         sleep(1)
     }
     
-    func editContact(_ id: Int) -> Contact? {
+    public func editContact(_ id: Int) -> Contact? {
         guard let contactIndex = presenter.getAllContacts().firstIndex(where: { $0.id == id }) else {
             consoleView.displayError("Контакт с ID \(id) не найден")
             return nil
@@ -236,5 +205,150 @@ class ContactsMenuView {
         )
         
         return updatedContact
+    }
+    
+    public func searchContacts(_ query: String, contacts: [Contact]) -> [Contact] {
+        if query.isEmpty {
+            return contacts
+        }
+        
+        let lowercasedQuery = query.lowercased()
+        return contacts.filter { contact in
+            // Поиск по имени
+            if contact.personalInfo.name.lowercased().contains(lowercasedQuery) {
+                return true
+            }
+            // Поиск по фамилии
+            if contact.personalInfo.surname.lowercased().contains(lowercasedQuery) {
+                return true
+            }
+            // Поиск по отчеству
+            if contact.personalInfo.middlename.lowercased().contains(lowercasedQuery) {
+                return true
+            }
+            // Поиск по телефону
+            if let phone = contact.connects.phone, phone.lowercased().contains(lowercasedQuery) {
+                return true
+            }
+            // Поиск по заметке
+            if let note = contact.note, note.lowercased().contains(lowercasedQuery) {
+                return true
+            }
+            return false
+        }
+    }
+    
+    public func showSearchContacts() {
+        let contacts = presenter.getAllContacts()
+        if contacts.isEmpty {
+            consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
+            return
+        }
+        
+        print("\n\(ANSIColors.green)\(ANSIColors.bold)🔍 Поиск контактов\(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)──────────────────────────────────────────────\(ANSIColors.reset)")
+        
+        guard let query = consoleView.inputString(prompt: "\nВведите поисковый запрос: ", required: true) else { return }
+        
+        if query.lowercased() == "q" { return }
+        
+        let searchResults = searchContacts(query, contacts: contacts)
+        
+        if searchResults.isEmpty {
+            consoleView.displayInfo("По запросу '\(query)' ничего не найдено.")
+        } else {
+            print("\n\(ANSIColors.green)\(ANSIColors.bold)🔍 Результаты поиска по запросу '\(query)':\(ANSIColors.reset)")
+            print("\(ANSIColors.yellow)───────────────────────────────\(ANSIColors.reset)")
+            
+            for contact in searchResults {
+                print("\n\(ANSIColors.cyan)ID \(contact.id):\(ANSIColors.reset)")
+                print(contact.toStr())
+            }
+        }
+        
+        consoleView.displayInfo("Нажмите Enter для продолжения...")
+    }
+    
+    public func showEditContactWithSearch(_ contacts: [Contact]) {
+        print("\n\(ANSIColors.green)\(ANSIColors.bold)✏️ Редактирование контакта\(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)──────────────────────────────────────────────\(ANSIColors.reset)")
+        
+        guard let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ") else { return }
+        
+        if query.lowercased() == "q" { return }
+        
+        let filteredContacts = searchContacts(query, contacts: contacts)
+        
+        if filteredContacts.isEmpty {
+            consoleView.displayInfo("По запросу '\(query)' ничего не найдено. Нажмите Enter для продолжения...")
+            return
+        }
+        
+        for contact in filteredContacts {
+            print("\n\(ANSIColors.cyan)ID \(contact.id):\(ANSIColors.reset)")
+            print(contact.toStr())
+        }
+        
+        guard let idString = consoleView.inputString(prompt: "\nВведите ID контакта для редактирования: ", required: true) else { return }
+        
+        if idString.lowercased() == "q" { return }
+        
+        guard let id = Int(idString) else {
+            consoleView.displayError("Неверный ID. Должно быть число.")
+            consoleView.displayInfo("Нажмите Enter для продолжения...")
+            return
+        }
+        
+        if let editedContact = editContact(id) {
+            if presenter.editContact(id: id, updatedContact: editedContact) {
+                consoleView.displaySuccess("Контакт с ID \(id) успешно отредактирован")
+            } else {
+                consoleView.displayError("Не удалось отредактировать контакт с ID \(id)")
+            }
+        }
+        
+        consoleView.displayInfo("Нажмите Enter для продолжения...")
+    }
+    
+    public func showDeleteContactWithSearch(_ contacts: [Contact]) {
+        print("\n\(ANSIColors.green)\(ANSIColors.bold)🗑️ Удаление контакта\(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)")
+        print("\n\(ANSIColors.yellow)──────────────────────────────────────────────\(ANSIColors.reset)")
+        
+        guard let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ") else { return }
+        
+        if query.lowercased() == "q" { return }
+        
+        let filteredContacts = searchContacts(query, contacts: contacts)
+        
+        if filteredContacts.isEmpty {
+            consoleView.displayInfo("По запросу '\(query)' ничего не найдено. Нажмите Enter для продолжения...")
+            return
+        }
+        
+        for contact in filteredContacts {
+            print("\n\(ANSIColors.cyan)ID \(contact.id):\(ANSIColors.reset)")
+            print(contact.toStr())
+        }
+        
+        guard let idString = consoleView.inputString(prompt: "\nВведите ID контакта для удаления: ", required: true) else { return }
+        
+        if idString.lowercased() == "q" { return }
+        
+        guard let id = Int(idString) else {
+            consoleView.displayError("Неверный ID. Должно быть число.")
+            consoleView.displayInfo("Нажмите Enter для продолжения...")
+            return
+        }
+        
+        if presenter.deleteContact(id: id) {
+            consoleView.displaySuccess("Контакт с ID \(id) успешно удален")
+        } else {
+            consoleView.displayError("Контакт с ID \(id) не найден")
+        }
+        
+        consoleView.displayInfo("Нажмите Enter для продолжения...")
     }
 }
