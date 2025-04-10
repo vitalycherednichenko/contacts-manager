@@ -2,10 +2,24 @@ import Foundation
 
 class FileInteractor {
     private(set) var fileURL: URL
+    private let dataFolderPath: String
     
     init() {
-        fileURL = URL(fileURLWithPath: "contacts.json", relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
-        print("Файл контактов: \(fileURL.path)")
+        let fileManager = FileManager.default
+        let currentDir = fileManager.currentDirectoryPath
+        self.dataFolderPath = currentDir + "/data"
+        
+        // Проверяем существование папки data, если нет - создаем
+        if !fileManager.fileExists(atPath: dataFolderPath) {
+            do {
+                try fileManager.createDirectory(atPath: dataFolderPath, withIntermediateDirectories: true)
+            } catch {
+                print("Ошибка при создании папки data: \(error.localizedDescription)")
+            }
+        }
+        
+        // Создаем URL для файла в папке data
+        fileURL = URL(fileURLWithPath: "contacts.json", relativeTo: URL(fileURLWithPath: dataFolderPath))
     }
     
     func setTestFileURL(_ url: URL) {
@@ -29,7 +43,6 @@ class FileInteractor {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
             let contacts = try decoder.decode([Contact].self, from: data)
-            print("Контакты успешно загружены из файла: \(fileURL.path)")
             return contacts
         } catch {
             print("Ошибка загрузки данных: \(error.localizedDescription)")

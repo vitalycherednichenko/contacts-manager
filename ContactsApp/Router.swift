@@ -32,7 +32,8 @@ class Router: RouterProtocol {
     }
  
     func showSettingsMenu() {
-        print("showSettingsMenu")
+        let view = SettingsView(router: self)
+        view.run()
     }
 }
 
