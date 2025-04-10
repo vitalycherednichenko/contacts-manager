@@ -16,12 +16,12 @@ protocol ContactMenuViewProtocol {
     func searchContacts(_ query: String, contacts: [Contact]) -> [Contact]
 }
 
-class ContactsMenuView: ViewProtocol, MenuViewProtocol, ContactMenuViewProtocol {
+class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
     private let presenter: ContactPresenterProtocol
     private let consoleView: ConsoleView
     private let router: RouterProtocol
     
-    init (router: RouterProtocol) {
+    init(router: RouterProtocol) {
         self.consoleView = ConsoleView()
         self.presenter = ContactPresenter()
         self.router = router

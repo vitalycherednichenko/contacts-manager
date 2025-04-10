@@ -1,5 +1,3 @@
-import Foundation
-
 enum ANSIColors {
     static let reset = "\u{001B}[0m"
     static let bold = "\u{001B}[1m"

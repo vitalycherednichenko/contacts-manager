@@ -22,12 +22,13 @@ class Router: RouterProtocol {
     }
     
     func showContactsMenu() {
-        let view = ContactsMenuView(router: self)
+        let view = ContactMenuView(router: self)
         view.run()
     }
     
     func showProfileMenu() {
-        print("showProfileMenu")
+        let view = ProfileMenuView(router: self)
+        view.run()
     }
  
     func showSettingsMenu() {

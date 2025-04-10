@@ -5,6 +5,8 @@ protocol ContactPresenterProtocol {
     func createContact() -> Contact?
     func deleteContact(id: Int) -> Bool
     func editContact(id: Int, updatedContact: Contact) -> Bool
+    func setMainContact(id: Int) -> Bool
+    func getMainContact() -> Contact?
 }
 
 
@@ -27,7 +29,7 @@ class ContactPresenter: ContactPresenterProtocol {
     }
     
     func getAllContacts() -> [Contact] {
-        return contacts
+        contacts
     }
     
     public func createContact() -> Contact? {
@@ -78,5 +80,26 @@ class ContactPresenter: ContactPresenterProtocol {
         contacts.remove(at: index)
         try? fileManager.saveContacts(contacts)
         return true
+    }
+    
+    public func setMainContact(id: Int) -> Bool {
+        guard let index = contacts.firstIndex(where: { $0.id == id }) else {
+            return false
+        }
+        
+        // Сначала сбрасываем флаг isMain у всех контактов
+        for i in 0..<contacts.count {
+            contacts[i].isMain = false
+        }
+        
+        // Устанавливаем флаг isMain для выбранного контакта
+        contacts[index].isMain = true
+        
+        try? fileManager.saveContacts(contacts)
+        return true
+    }
+    
+    public func getMainContact() -> Contact? {
+        return contacts.first { $0.isMain }
     }
 }

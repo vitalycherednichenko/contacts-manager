@@ -5,24 +5,32 @@ struct Contact: Codable {
     var personalInfo: PersonalInfo
     var connects: ConnectsInfo
     var note: String?
+    var isMain: Bool = false
+
+    var fullName: String {
+        "\(personalInfo.surname) \(personalInfo.name) \(personalInfo.middlename)"
+    }
     
-    init(id: Int, personalInfo: PersonalInfo = PersonalInfo(), connects: ConnectsInfo = ConnectsInfo(), note: String? = nil) {
+    init(
+        id: Int,
+        personalInfo: PersonalInfo = PersonalInfo(),
+        connects: ConnectsInfo = ConnectsInfo(),
+        note: String? = nil,
+        isMain: Bool = false
+    ) {
         self.id = id
         self.personalInfo = personalInfo
         self.connects = connects
         self.note = note
+        self.isMain = isMain
     }
 
-    func toStr() -> String {
+    public func toStr() -> String {
         var result = """
         \(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)
         \(ANSIColors.cyan)\(ANSIColors.bold)👤 Контактная информация:\(ANSIColors.reset)
-        \(ANSIColors.cyan)📛 ФИО: \(ANSIColors.reset)\(personalInfo.surname) \(personalInfo.name)
+        \(ANSIColors.cyan)📛 ФИО: \(ANSIColors.reset)\(fullName)
         """
-        
-        if !personalInfo.middlename.isEmpty {
-            result += " \(personalInfo.middlename)"
-        }
         
         if let phone = connects.phone {
             result += "\n\(ANSIColors.cyan)📱 Телефон: \(ANSIColors.reset)\(phone)"
@@ -30,6 +38,10 @@ struct Contact: Codable {
         
         if let note = note {
             result += "\n\(ANSIColors.cyan)📝 Заметка: \(ANSIColors.reset)\(note)"
+        }
+        
+        if isMain {
+            result += "\n\(ANSIColors.green)🌟 Основной контакт\(ANSIColors.reset)"
         }
         
         result += "\n\(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)"

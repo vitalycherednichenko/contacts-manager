@@ -5,7 +5,11 @@ struct PersonalInfo: Codable {
     var surname: String = ""
     var middlename: String = ""
     
-    init(name: String = "", surname: String = "", middlename: String = "") {
+    init(
+        name: String = "",
+        surname: String = "",
+        middlename: String = ""
+    ) {
         self.name = name
         self.surname = surname
         self.middlename = middlename

@@ -5,7 +5,7 @@ protocol MainMenuViewProtocol {
     func getAppVersion() -> String
 }
 
-class MainMenuView: ViewProtocol, MenuViewProtocol, MainMenuViewProtocol  {
+class MainMenuView: MenuViewProtocol, MainMenuViewProtocol  {
     private let presenter: MainMenuPresenterProtocol
     private let consoleView: ConsoleView
     private let router: RouterProtocol
