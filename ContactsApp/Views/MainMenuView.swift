@@ -25,24 +25,17 @@ class MainMenuView: MenuViewProtocol, MainMenuViewProtocol  {
     
     public func showMainMenu() {
         consoleView.clearScreen()
-        let version = getAppVersion()
-        print("""
-                \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-                ║                📱 Контакты людей \(version)                    ║
-                ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-                
-                \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
-                
-                \(ANSIColors.green)1. 📞 Контакты
-                
-                2. 👤 Ваш профиль
-                
-                3. ⚙️  Настройки
-                
-                4. 🚪 Выход\(ANSIColors.reset)
-                
-                \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
-                """, terminator: "")
+        consoleView.menuHeader("📱 Контакты людей \(getAppVersion())")
+        consoleView.menuTitle("Выберите действие:")
+        for item in [
+            "1. 📞 Контакты",
+            "2. 👤 Ваш профиль",
+            "3. ⚙️  Настройки",
+            "4. 🚪 Выход"
+        ] {
+            consoleView.menuItem(item)
+        }
+        consoleView.callToAction("Ваш выбор:")
     }
     
     public func handleInput(_ input: String) {

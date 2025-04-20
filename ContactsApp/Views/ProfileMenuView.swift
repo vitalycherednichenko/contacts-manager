@@ -25,32 +25,23 @@ class ProfileMenuView: MenuViewProtocol, ProfileMenuViewProtocol {
     
     public func showProfileMenu() {
         consoleView.clearScreen()
-        print("""
-                \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-                ║                👤 Главное меню / Профиль                  ║
-                ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-                
-                \(ANSIColors.yellow)\(ANSIColors.bold)Ваш профиль\(ANSIColors.reset)
-                """)
+        consoleView.menuHeader("👤 Главное меню / Профиль")
+        consoleView.menuTitle("Ваш профиль")
         
-        // Отображаем основной контакт если он выбран
         if let mainContact = presenter.getMainContact() {
-            print("\n\(ANSIColors.green)\(ANSIColors.bold)👤 Основной контакт:\(ANSIColors.reset)")
             print(mainContact.toStr())
         } else {
-            print("\n\(ANSIColors.yellow)👤 Основной контакт не выбран\(ANSIColors.reset)")
+            consoleView.menuItem("👤 Основной контакт не выбран")
         }
         
-        print("""
-                
-                \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
-                
-                \(ANSIColors.green)1. 👤 Выбрать основной контакт
-                
-                2. ◀️  Назад в главное меню\(ANSIColors.reset)
-                
-                \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
-                """, terminator: "")
+        consoleView.menuTitle("Выберите действие:")
+        for item in [
+            "1. 👤 Выбрать основной контакт",
+            "2. ◀️  Назад в главное меню"
+        ] {
+            consoleView.menuItem(item)
+        }
+        consoleView.callToAction("Ваш выбор:")
     }
     
     public func handleInput(_ input: String) {
@@ -65,16 +56,10 @@ class ProfileMenuView: MenuViewProtocol, ProfileMenuViewProtocol {
     
     public func showSearchMainContact() {
         consoleView.clearScreen()
-        print("""
-                \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-                ║              👤 Выбор основного контакта                  ║
-                ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-                
-                \(ANSIColors.yellow)\(ANSIColors.bold)Выберите контакт, который станет основным\(ANSIColors.reset)
-                """)
-        
-        print("\n\(ANSIColors.yellow)◀️  Если хотите вернутся в меню введите 'q' \(ANSIColors.reset)")
-        print("\n\(ANSIColors.yellow)──────────────────────────────────────────────\(ANSIColors.reset)")
+        consoleView.menuHeader("👤 Выбор основного контакта")
+        consoleView.menuTitle("Выберите контакт, который станет основным")
+        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
+        consoleView.menuHr()
         
         let contacts = presenter.getAllContacts()
         
@@ -83,7 +68,7 @@ class ProfileMenuView: MenuViewProtocol, ProfileMenuViewProtocol {
             return
         }
         
-        guard let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ") else { return }
+        let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ")
         
         if query.lowercased() == "q" { return }
         
@@ -99,7 +84,7 @@ class ProfileMenuView: MenuViewProtocol, ProfileMenuViewProtocol {
             print(contact.toStr())
         }
         
-        guard let idString = consoleView.inputString(prompt: "\nВведите ID контакта для выбора основным: ", required: true) else { return }
+        let idString = consoleView.inputString(prompt: "\nВведите ID контакта для выбора основным: ", required: true)
         
         if idString.lowercased() == "q" { return }
         
@@ -132,11 +117,11 @@ class ProfileMenuView: MenuViewProtocol, ProfileMenuViewProtocol {
                 return true
             }
             // Поиск по фамилии
-            if contact.personalInfo.surname.lowercased().contains(lowercasedQuery) {
+            if ((contact.personalInfo.surname?.lowercased().contains(lowercasedQuery)) != nil) {
                 return true
             }
             // Поиск по отчеству
-            if contact.personalInfo.middlename.lowercased().contains(lowercasedQuery) {
+            if ((contact.personalInfo.middlename?.lowercased().contains(lowercasedQuery)) != nil) {
                 return true
             }
             // Поиск по телефону

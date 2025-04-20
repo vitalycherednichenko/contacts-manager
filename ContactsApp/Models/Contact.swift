@@ -8,7 +8,9 @@ struct Contact: Codable {
     var isMain: Bool = false
 
     var fullName: String {
-        "\(personalInfo.surname) \(personalInfo.name) \(personalInfo.middlename)"
+        """
+        \(personalInfo.surname ?? "") \(personalInfo.name) \(personalInfo.middlename ?? "")
+        """
     }
     
     init(
@@ -29,6 +31,7 @@ struct Contact: Codable {
         var result = """
         \(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)
         \(ANSIColors.cyan)\(ANSIColors.bold)👤 Контактная информация:\(ANSIColors.reset)
+        \(ANSIColors.cyan)🆔 ID: \(ANSIColors.reset)\(id)
         \(ANSIColors.cyan)📛 ФИО: \(ANSIColors.reset)\(fullName)
         """
         
@@ -44,7 +47,7 @@ struct Contact: Codable {
             result += "\n\(ANSIColors.green)🌟 Основной контакт\(ANSIColors.reset)"
         }
         
-        result += "\n\(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)"
+        result += "\n\(ANSIColors.blue)───────────────────────────────\(ANSIColors.reset)\n"
         return result
     }
 } 
