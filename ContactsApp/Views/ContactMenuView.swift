@@ -8,18 +8,15 @@ protocol ContactMenuViewProtocol {
     func showDeleteContact(_ contacts: [Contact])
 }
 
-class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
+class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
     private let presenter: ContactPresenterProtocol
-    private let consoleView: ConsoleView
-    private let router: RouterProtocol
     
-    init(router: RouterProtocol) {
-        self.consoleView = ConsoleView()
+    override init(router: RouterProtocol) {
         self.presenter = ContactPresenter()
-        self.router = router
+        super.init(router: router)
     }
     
-    public func run () {
+    override public func run() {
         showContactsMenu()
         if let input = readLine() {
             handleInput(input)
@@ -27,24 +24,23 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
     }
     
     public func showContactsMenu() {
-        consoleView.clearScreen()
-        consoleView.menuHeader("📱 Главное меню / Контакты")
-        consoleView.menuTitle("Выберите действие:")
-        
-        for item in [
+        let menuItems = [
             "1. 📝 Добавить новый контакт",
             "2. 👥 Просмотреть все контакты",
             "3. 🔍 Поиск контактов",
             "4. ✏️  Редактировать контакт",
             "5. 🗑️  Удалить контакт",
             "6. ◀️  Назад в главное меню \(ANSIColors.reset)"
-        ] {
-            consoleView.menuItem(item)
-        }
-        consoleView.callToAction("Ваш выбор:")
+        ]
+        
+        showMenu(
+            header: "📱 Главное меню / Контакты",
+            title: "Выберите действие:",
+            menuItems: menuItems
+        )
     }
     
-    public func handleInput(_ input: String) {
+    override public func handleInput(_ input: String) {
         switch input {
         case "1":
             showCreateContactMenu()
@@ -73,9 +69,10 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
         if let contact = presenter.createContact() {
             consoleView.displaySuccess("Контакт успешно создан:", description: contact.toStr())
         } else {
-            consoleView.displayError("Ошибка создания контакта")
+            // Пользователь ввел 'q' или произошла ошибка
+            return
         }
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
+        waitForEnter()
     }
     
     public func showAllContacts() {
@@ -90,7 +87,7 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
                 print(contact.toStr())
             }
         }
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
+        waitForEnter()
     }
     
     public func showSearchContacts() {
@@ -105,7 +102,7 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
         
         let query = consoleView.inputString(prompt: "\nВведите поисковый запрос: ", required: true)
         
-        if query.lowercased() == "q" { return }
+        if handleQInput(query) { return }
         
         let searchResults = presenter.searchContacts(query, contacts: contacts)
         
@@ -120,27 +117,29 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
             }
         }
         
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
+        waitForEnter()
     }
     
     public func showEditContact(_ contacts: [Contact]) {
         consoleView.menuSubTitle("✏️ Редактирование контакта")
-        guard let id = showSearchContactsAndGetId(action: "редактирования") else {
+        
+        guard let id = searchAndSelectContact(presenter: presenter, action: "редактирования") else {
             return
         }
         
         if presenter.editContact(id: id) {
-                consoleView.displaySuccess("Контакт с ID \(id) успешно отредактирован")
+            consoleView.displaySuccess("Контакт с ID \(id) успешно отредактирован")
         } else {
-                consoleView.displayError("Не удалось отредактировать контакт с ID \(id)")
+            consoleView.displayError("Не удалось отредактировать контакт с ID \(id)")
         }
         
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
+        waitForEnter()
     }
     
     public func showDeleteContact(_ contacts: [Contact]) {
         consoleView.menuSubTitle("🗑️ Удаление контакта")
-        guard let id = showSearchContactsAndGetId(action: "удаления") else {
+        
+        guard let id = searchAndSelectContact(presenter: presenter, action: "удаления") else {
             return
         }
         
@@ -150,44 +149,6 @@ class ContactMenuView: MenuViewProtocol, ContactMenuViewProtocol {
             consoleView.displayError("Контакт с ID \(id) не найден")
         }
         
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
-    }
-    
-    public func showSearchContactsAndGetId(action: String) -> Int? {
-        let contacts = presenter.getAllContacts()
-        if contacts.isEmpty {
-            consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
-            return nil
-        }
-        
-        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
-        consoleView.menuHr()
-        
-        let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ")
-        
-        if query.lowercased() == "q" { return nil }
-        
-        let filteredContacts = presenter.searchContacts(query, contacts: contacts)
-        
-        if filteredContacts.isEmpty {
-            consoleView.displayInfo("По запросу '\(query)' ничего не найдено. Нажмите Enter для продолжения...")
-            return nil
-        }
-        
-        for contact in filteredContacts {
-            print(contact.toStr())
-        }
-        
-        let idString = consoleView.inputString(prompt: "\nВведите ID контакта для \(action): ", required: true)
-        
-        if idString.lowercased() == "q" { return nil }
-        
-        guard let id = Int(idString) else {
-            consoleView.displayError("Неверный ID. Должно быть число.")
-            consoleView.displayInfo("Нажмите Enter для продолжения...")
-            return nil
-        }
-        
-        return id
+        waitForEnter()
     }
 }

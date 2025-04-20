@@ -2,6 +2,7 @@ import Foundation
 
 protocol ConsoleViewProtocol {
     func inputString(prompt: String, required: Bool) -> String
+    func inputInteger(prompt: String, required: Bool) -> Int?
     func displayError(_ message: String)
     func displaySuccess(_ message: String, description: String?)
     func displayInfo(_ message: String)
@@ -9,24 +10,46 @@ protocol ConsoleViewProtocol {
 
 class ConsoleView: ConsoleViewProtocol {
 
+    private func getInput(prompt: String, required: Bool) -> String? {
+        callToAction(prompt)
+        
+        guard let input = readLine()?.trimmingCharacters(in: .whitespaces) else {
+            return nil
+        }
+        
+        if input.lowercased() == "q" {
+            return "q"
+        }
+        
+        if input.isEmpty, required {
+            displayError("Поле не может быть пустым. Попробуйте снова")
+            return nil
+        }
+        
+        return input
+    }
+
     public func inputString(prompt: String, required: Bool = false) -> String {
         while true {
-            callToAction(prompt)
-            
-            guard let input = readLine()?.trimmingCharacters(in: .whitespaces) else {
-                continue
+            if let input = getInput(prompt: prompt, required: required) {
+                return input
             }
-            
-            if input.lowercased() == "q" {
-                return "q"
+        }
+    }
+    
+    public func inputInteger(prompt: String, required: Bool = false) -> Int? {
+        while true {
+            if let input = getInput(prompt: prompt, required: required) {
+                if input == "q" {
+                    return nil
+                }
+                
+                if let number = Int(input) {
+                    return number
+                } else {
+                    displayError("Введите корректное числовое значение")
+                }
             }
-            
-            if input.isEmpty, required {
-                displayError("Поле не может быть пустым. Попробуйте снова")
-                continue
-            }
-            
-            return input
         }
     }
     
@@ -34,13 +57,13 @@ class ConsoleView: ConsoleViewProtocol {
         print(
             """
                 \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-                ║                \(text)                        ║
+                                   \(text)                        
                 ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)            
             """)
     }
     
     public func menuTitle(_ text: String) {
-        print("\n\(ANSIColors.yellow)\(ANSIColors.bold)\(text)\(ANSIColors.reset)\n")
+        print("\n\(ANSIColors.yellow)\(ANSIColors.bold)\(text)\(ANSIColors.reset)")
     }
     
     public func menuSubTitle(_ text: String) {

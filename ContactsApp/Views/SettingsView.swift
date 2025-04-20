@@ -5,16 +5,9 @@ protocol SettingsViewProtocol {
     func showSettingsMenu()
 }
 
-class SettingsView: MenuViewProtocol, SettingsViewProtocol {
-    private let consoleView: ConsoleView
-    private let router: RouterProtocol
+class SettingsView: BaseMenuView, SettingsViewProtocol {
     
-    init(router: RouterProtocol) {
-        self.router = router
-        self.consoleView = ConsoleView()
-    }
-    
-    func run() {
+    override func run() {
         showSettingsMenu()
         if let input = readLine() {
             handleInput(input)
@@ -22,27 +15,21 @@ class SettingsView: MenuViewProtocol, SettingsViewProtocol {
     }
     
     public func showSettingsMenu() {
-        consoleView.clearScreen()
-        print("""
-              \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-              ║                ⚙️  Настройки                               ║
-              ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-              
-              \(ANSIColors.yellow)\(ANSIColors.bold)Выберите действие:\(ANSIColors.reset)
-              
-              \(ANSIColors.green)1. 🔄 Синхронизация с iCloud контактами
-              
-              2. 📁 Путь к файлу контактов
-              
-              3. 🎨 Настройки отображения
-              
-              4. ◀️  Назад в главное меню\(ANSIColors.reset)
-              
-              \(ANSIColors.blue)Ваш выбор: \(ANSIColors.reset)
-              """, terminator: "")
+        let menuItems = [
+            "1. 🔄 Синхронизация с iCloud контактами",
+            "2. 📁 Путь к файлу контактов",
+            "3. 🎨 Настройки отображения",
+            "4. ◀️  Назад в главное меню"
+        ]
+        
+        showMenu(
+            header: "⚙️  Настройки",
+            title: "Выберите действие:",
+            menuItems: menuItems
+        )
     }
     
-    public func handleInput(_ input: String) {
+    override public func handleInput(_ input: String) {
         switch input {
         case "1": syncContacts()
         case "2": showFilePath()
@@ -56,23 +43,17 @@ class SettingsView: MenuViewProtocol, SettingsViewProtocol {
     
     private func syncContacts() {
         consoleView.clearScreen()
-        print("""
-              \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-              ║                🔄 Синхронизация контактов                  ║
-              ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-              
-              \(ANSIColors.yellow)Начинаем синхронизацию с iCloud контактами...\(ANSIColors.reset)
-              """)
+        consoleView.menuHeader("🔄 Синхронизация контактов")
+        consoleView.menuInfoItem("Начинаем синхронизацию с iCloud контактами...")
         
         // Создаем экземпляр интерактора
         let contactsSyncInteractor = ContactsSyncInteractor()
         
-        // Запрашиваем доступ
-        print("\(ANSIColors.yellow)Запрашиваем доступ к контактам...\(ANSIColors.reset)")
+        consoleView.menuInfoItem("Запрашиваем доступ к контактам...")
         let hasAccess = contactsSyncInteractor.requestAccess()
         
         if !hasAccess {
-            print("\(ANSIColors.red)❌ Доступ к контактам не был предоставлен.\(ANSIColors.reset)")
+            consoleView.displayError("Доступ к контактам не был предоставлен.")
             
             // Проверяем текущий статус доступа более подробно
             let status = CNContactStore.authorizationStatus(for: .contacts)
@@ -80,116 +61,94 @@ class SettingsView: MenuViewProtocol, SettingsViewProtocol {
             switch status {
             case .denied:
                 // Пользователь ранее отклонил доступ, нужно перейти в настройки
-                print("""
-                      \(ANSIColors.yellow)
+                consoleView.menuInfoItem("""
                       ⚠️ Доступ к контактам ранее был отклонен.
                       
                       Для включения доступа к контактам необходимо изменить настройки системы.
-                      \(ANSIColors.reset)
                       """)
                 
-                print("\n\(ANSIColors.blue)Хотите открыть системные настройки конфиденциальности? (д/н): \(ANSIColors.reset)", terminator: "")
-                if let choice = readLine()?.lowercased(), choice == "д" {
+                let choice = consoleView.inputString(prompt: "Хотите открыть системные настройки конфиденциальности? (д/н): ")
+                if choice.lowercased() == "д" {
                     openContactsPrivacySettings()
-                    print("\n\(ANSIColors.yellow)После изменения настроек вернитесь в приложение.\(ANSIColors.reset)")
+                    consoleView.menuInfoItem("После изменения настроек вернитесь в приложение.")
                     sleep(2) // Даем время пользователю прочитать сообщение
                 }
                 
             case .restricted:
                 // Доступ ограничен родительским контролем или политикой организации
-                print("""
-                      \(ANSIColors.yellow)
+                consoleView.menuInfoItem("""
                       ⚠️ Доступ к контактам ограничен настройками устройства или родительским контролем.
                       
                       Пожалуйста, обратитесь к администратору устройства для разрешения доступа к контактам.
-                      \(ANSIColors.reset)
                       """)
                 
-                print("\n\(ANSIColors.blue)Хотите открыть системные настройки конфиденциальности? (д/н): \(ANSIColors.reset)", terminator: "")
-                if let choice = readLine()?.lowercased(), choice == "д" {
+                let choice = consoleView.inputString(prompt: "Хотите открыть системные настройки конфиденциальности? (д/н): ")
+                if choice.lowercased() == "д" {
                     openContactsPrivacySettings()
-                    print("\n\(ANSIColors.yellow)После изменения настроек вернитесь в приложение.\(ANSIColors.reset)")
+                    consoleView.menuInfoItem("После изменения настроек вернитесь в приложение.")
                     sleep(2) // Даем время пользователю прочитать сообщение
                 }
                 
             default:
                 // Общее сообщение для других случаев
-                print("""
-                      \(ANSIColors.yellow)
-                      Проверьте настройки конфиденциальности и предоставьте доступ к контактам.
-                      \(ANSIColors.reset)
-                      """)
+                consoleView.menuInfoItem("Проверьте настройки конфиденциальности и предоставьте доступ к контактам.")
                 
-                print("\n\(ANSIColors.blue)Хотите открыть системные настройки конфиденциальности? (д/н): \(ANSIColors.reset)", terminator: "")
-                if let choice = readLine()?.lowercased(), choice == "д" {
+                let choice = consoleView.inputString(prompt: "Хотите открыть системные настройки конфиденциальности? (д/н): ")
+                if choice.lowercased() == "д" {
                     openContactsPrivacySettings()
-                    print("\n\(ANSIColors.yellow)После изменения настроек вернитесь в приложение.\(ANSIColors.reset)")
+                    consoleView.menuInfoItem("После изменения настроек вернитесь в приложение.")
                     sleep(2) // Даем время пользователю прочитать сообщение
                 }
             }
             
-            print("\n\(ANSIColors.blue)Хотите попробовать снова после изменения настроек? (д/н): \(ANSIColors.reset)", terminator: "")
-            if let choice = readLine()?.lowercased(), choice == "д" {
+            let retryChoice = consoleView.inputString(prompt: "Хотите попробовать снова после изменения настроек? (д/н): ")
+            if retryChoice.lowercased() == "д" {
                 syncContacts() // Рекурсивно вызываем тот же метод для повторной попытки
                 return
             }
             
-            waitForInput()
+            waitForEnter()
             return
         }
         
         // Синхронизируем контакты с основной базой данных приложения
-        print("\(ANSIColors.green)✅ Доступ получен. Синхронизируем контакты...\(ANSIColors.reset)")
+        consoleView.displaySuccess("Доступ получен. Синхронизируем контакты...", description: nil)
         let result = contactsSyncInteractor.syncWithAppContacts()
         
         if result.total == 0 {
-            print("\(ANSIColors.yellow)⚠️ Не удалось найти контакты в iCloud.\(ANSIColors.reset)")
+            consoleView.displayInfo("Не удалось найти контакты в iCloud.")
         } else {
-            print("\(ANSIColors.green)📱 Найдено \(result.total) контактов в iCloud.\(ANSIColors.reset)")
+            consoleView.menuInfoItem("📱 Найдено \(result.total) контактов в iCloud.")
             
             if result.imported > 0 {
-                print("\(ANSIColors.green)✅ Успешно импортировано \(result.imported) новых контактов.\(ANSIColors.reset)")
+                consoleView.displaySuccess("Успешно импортировано \(result.imported) новых контактов.", description: nil)
             } else {
-                print("\(ANSIColors.yellow)ℹ️ Новых контактов для импорта не найдено.\(ANSIColors.reset)")
+                consoleView.displayInfo("Новых контактов для импорта не найдено.")
             }
         }
         
-        waitForInput()
+        waitForEnter()
     }
     
     private func showFilePath() {
         consoleView.clearScreen()
-        print("""
-              \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-              ║                📁 Путь к файлу контактов                      ║
-              ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-              
-              \(ANSIColors.green)Текущий путь к файлу контактов: \(ANSIColors.reset)\(FileManager.default.currentDirectoryPath)/contacts.json
-              \(ANSIColors.green)Путь к файлу iCloud контактов: \(ANSIColors.reset)\(FileManager.default.currentDirectoryPath)/data/icloud_contacts.json
-              
-              \(ANSIColors.yellow)Функция изменения пути будет доступна в следующих версиях.\(ANSIColors.reset)
-              """)
+        consoleView.menuHeader("📁 Путь к файлу контактов")
         
-        waitForInput()
+        consoleView.menuItem("Текущий путь к файлу контактов: \(FileManager.default.currentDirectoryPath)/contacts.json")
+        consoleView.menuItem("Путь к файлу iCloud контактов: \(FileManager.default.currentDirectoryPath)/data/icloud_contacts.json")
+        
+        consoleView.menuInfoItem("Функция изменения пути будет доступна в следующих версиях.")
+        
+        waitForEnter()
     }
     
     private func showDisplaySettings() {
         consoleView.clearScreen()
-        print("""
-              \(ANSIColors.cyan)\(ANSIColors.bold)╔════════════════════════════════════════════════════════════╗
-              ║                🎨 Настройки отображения                        ║
-              ╚════════════════════════════════════════════════════════════╝\(ANSIColors.reset)
-              
-              \(ANSIColors.yellow)Настройки отображения будут доступны в следующих версиях.\(ANSIColors.reset)
-              """)
+        consoleView.menuHeader("🎨 Настройки отображения")
         
-        waitForInput()
-    }
-    
-    private func waitForInput() {
-        print("\n\(ANSIColors.yellow)Нажмите Enter для возврата в меню...\(ANSIColors.reset)")
-        _ = readLine()
-        run()
+        consoleView.menuInfoItem("Настройки отображения будут доступны в следующих версиях.")
+        
+        waitForEnter()
     }
     
     // Метод для открытия системных настроек конфиденциальности
@@ -204,9 +163,9 @@ class SettingsView: MenuViewProtocol, SettingsViewProtocol {
         
         do {
             try process.run()
-            print("\(ANSIColors.green)✅ Открываю системные настройки...\(ANSIColors.reset)")
+            consoleView.displaySuccess("Открываю системные настройки...", description: nil)
         } catch {
-            print("\(ANSIColors.red)❌ Не удалось открыть системные настройки: \(error.localizedDescription)\(ANSIColors.reset)")
+            consoleView.displayError("Не удалось открыть системные настройки: \(error.localizedDescription)")
             
             // Альтернативный способ открытия настроек
             let alternativeProcess = Process()
@@ -215,21 +174,26 @@ class SettingsView: MenuViewProtocol, SettingsViewProtocol {
             
             do {
                 try alternativeProcess.run()
-                print("\(ANSIColors.green)✅ Открываю системные настройки безопасности...\(ANSIColors.reset)")
+                consoleView.displaySuccess("Открываю системные настройки безопасности...", description: nil)
             } catch {
-                print("\(ANSIColors.red)❌ Не удалось открыть системные настройки: \(error.localizedDescription)\(ANSIColors.reset)")
-                print("\(ANSIColors.yellow)Пожалуйста, откройте настройки контактов вручную.\(ANSIColors.reset)")
+                consoleView.displayError("Не удалось открыть системные настройки: \(error.localizedDescription)")
+                consoleView.displayInfo("Пожалуйста, откройте настройки контактов вручную.")
             }
         }
         #elseif os(iOS)
         // На iOS открываем настройки приложения
         if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(settingsUrl)
-            print("\(ANSIColors.green)✅ Открываю настройки приложения...\(ANSIColors.reset)")
+            consoleView.displaySuccess("Открываю настройки приложения...", description: nil)
         }
         #else
-        print("\(ANSIColors.yellow)⚠️ Автоматическое открытие настроек не поддерживается на этой платформе.\(ANSIColors.reset)")
-        print("\(ANSIColors.yellow)Пожалуйста, откройте настройки контактов вручную.\(ANSIColors.reset)")
+        consoleView.displayInfo("Автоматическое открытие настроек не поддерживается на этой платформе.")
+        consoleView.displayInfo("Пожалуйста, откройте настройки контактов вручную.")
         #endif
+    }
+    
+    internal override func waitForEnter() {
+        super.waitForEnter() // вызываем метод родителя
+        run() // запускаем меню снова
     }
 } 

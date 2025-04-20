@@ -35,10 +35,19 @@ class ContactPresenter: ContactPresenterProtocol {
     
     public func createContact() -> Contact? {
         let firstName = consoleView.inputString(prompt: "👤 *Имя: ", required: true)
+        if firstName.lowercased() == "q" { return nil }
+        
         let middlename = consoleView.inputString(prompt: "👤 Отчество: ")
+        if middlename.lowercased() == "q" { return nil }
+        
         let surname = consoleView.inputString(prompt: "👤 Фамилия: ")
+        if surname.lowercased() == "q" { return nil }
+        
         let phone = consoleView.inputString(prompt: "📱 Телефон: ")
+        if phone.lowercased() == "q" { return nil }
+        
         let note = consoleView.inputString(prompt: "📝 Заметка: ")
+        if note.lowercased() == "q" { return nil }
         
         let personalInfo = PersonalInfo(
             name: firstName,
@@ -166,11 +175,11 @@ class ContactPresenter: ContactPresenterProtocol {
                 return true
             }
             // Поиск по фамилии
-            if ((contact.personalInfo.surname?.lowercased().contains(lowercasedQuery)) != nil) {
+            if let surname = contact.personalInfo.surname, surname.lowercased().contains(lowercasedQuery) {
                 return true
             }
             // Поиск по отчеству
-            if ((contact.personalInfo.middlename?.lowercased().contains(lowercasedQuery)) != nil) {
+            if let middlename = contact.personalInfo.middlename, middlename.lowercased().contains(lowercasedQuery) {
                 return true
             }
             // Поиск по телефону

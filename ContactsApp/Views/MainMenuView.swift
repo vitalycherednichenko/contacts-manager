@@ -5,18 +5,15 @@ protocol MainMenuViewProtocol {
     func getAppVersion() -> String
 }
 
-class MainMenuView: MenuViewProtocol, MainMenuViewProtocol  {
+class MainMenuView: BaseMenuView, MainMenuViewProtocol {
     private let presenter: MainMenuPresenterProtocol
-    private let consoleView: ConsoleView
-    private let router: RouterProtocol
     
-    init(router: RouterProtocol) {
-        self.router = router
-        self.consoleView = ConsoleView()
+    override init(router: RouterProtocol) {
         self.presenter = MainMenuPresenter()
+        super.init(router: router)
     }
     
-    func run () {
+    override func run() {
         showMainMenu()
         if let input = readLine() {
             handleInput(input)
@@ -24,21 +21,21 @@ class MainMenuView: MenuViewProtocol, MainMenuViewProtocol  {
     }
     
     public func showMainMenu() {
-        consoleView.clearScreen()
-        consoleView.menuHeader("📱 Контакты людей \(getAppVersion())")
-        consoleView.menuTitle("Выберите действие:")
-        for item in [
+        let menuItems = [
             "1. 📞 Контакты",
             "2. 👤 Ваш профиль",
             "3. ⚙️  Настройки",
             "4. 🚪 Выход"
-        ] {
-            consoleView.menuItem(item)
-        }
-        consoleView.callToAction("Ваш выбор:")
+        ]
+        
+        showMenu(
+            header: "📱 Контакты людей \(getAppVersion())",
+            title: "Выберите действие:",
+            menuItems: menuItems
+        )
     }
     
-    public func handleInput(_ input: String) {
+    override public func handleInput(_ input: String) {
         switch input {
         case "1": router.showContactsMenu()
         case "2": router.showProfileMenu()
