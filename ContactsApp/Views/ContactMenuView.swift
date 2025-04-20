@@ -51,7 +51,7 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
         case "5": showDeleteContact(presenter.getAllContacts())
         case "6": router.showMainMenu()
         default:
-            consoleView.displayError("Неверный выбор. Попробуйте снова.")
+            consoleView.displayError(SystemMessages.Error.invalidChoice)
         }
         run()
     }
@@ -59,15 +59,15 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
     public func showCreateContactMenu() {
         consoleView.menuSubTitle("📝 Создание нового контакта")
         sleep(1)
-        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
-        consoleView.menuInfoItem("✳️  Обязательное поле отмечено *")
-        consoleView.menuInfoItem("ℹ️  Нажмите Enter, чтобы пропустить заполнение поля")
+        consoleView.menuInfoItem(SystemMessages.UI.backToMenuWithQ)
+        consoleView.menuInfoItem(SystemMessages.UI.requiredField)
+        consoleView.menuInfoItem(SystemMessages.UI.skipFieldWithEnter)
         consoleView.menuHr()
     }
     
     private func createContact() {
         if let contact = presenter.createContact() {
-            consoleView.displaySuccess("Контакт успешно создан:", description: contact.toStr())
+            consoleView.displaySuccess(SystemMessages.Success.contactCreated, description: contact.toStr())
         } else {
             // Пользователь ввел 'q' или произошла ошибка
             return
@@ -93,11 +93,11 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
     public func showSearchContacts() {
         let contacts = presenter.getAllContacts()
         if contacts.isEmpty {
-            consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
+            consoleView.displayInfo(SystemMessages.Info.emptyContactList)
             return
         }
         consoleView.menuSubTitle("🔍 Поиск контактов")
-        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
+        consoleView.menuInfoItem(SystemMessages.UI.backToMenuWithQ)
         consoleView.menuHr()
         
         let query = consoleView.inputString(prompt: "\nВведите поисковый запрос: ", required: true)
@@ -107,7 +107,7 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
         let searchResults = presenter.searchContacts(query, contacts: contacts)
         
         if searchResults.isEmpty {
-            consoleView.displayInfo("По запросу '\(query)' ничего не найдено.")
+            consoleView.displayInfo(String(format: SystemMessages.Info.noSearchResults, query))
         } else {
             consoleView.menuSubTitle("🔍 Результаты поиска по запросу '\(query)':")
             consoleView.menuHr()
@@ -128,9 +128,9 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
         }
         
         if presenter.editContact(id: id) {
-            consoleView.displaySuccess("Контакт с ID \(id) успешно отредактирован")
+            consoleView.displaySuccess(String(format: SystemMessages.Success.contactEdited, id))
         } else {
-            consoleView.displayError("Не удалось отредактировать контакт с ID \(id)")
+            consoleView.displayError(String(format: SystemMessages.Error.editContactFailed, id))
         }
         
         waitForEnter()
@@ -144,9 +144,9 @@ class ContactMenuView: BaseMenuView, ContactMenuViewProtocol {
         }
         
         if presenter.deleteContact(id: id) {
-            consoleView.displaySuccess("Контакт с ID \(id) успешно удален")
+            consoleView.displaySuccess(String(format: SystemMessages.Success.contactDeleted, id))
         } else {
-            consoleView.displayError("Контакт с ID \(id) не найден")
+            consoleView.displayError(String(format: SystemMessages.Error.contactNotFound, id))
         }
         
         waitForEnter()

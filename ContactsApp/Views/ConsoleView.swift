@@ -22,7 +22,7 @@ class ConsoleView: ConsoleViewProtocol {
         }
         
         if input.isEmpty, required {
-            displayError("Поле не может быть пустым. Попробуйте снова")
+            displayError(SystemMessages.Error.emptyField)
             return nil
         }
         
@@ -47,7 +47,7 @@ class ConsoleView: ConsoleViewProtocol {
                 if let number = Int(input) {
                     return number
                 } else {
-                    displayError("Введите корректное числовое значение")
+                    displayError(SystemMessages.Error.invalidNumber)
                 }
             }
         }

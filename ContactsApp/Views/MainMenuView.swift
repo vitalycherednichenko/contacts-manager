@@ -41,10 +41,10 @@ class MainMenuView: BaseMenuView, MainMenuViewProtocol {
         case "2": router.showProfileMenu()
         case "3": router.showSettingsMenu()
         case "4":
-            consoleView.displaySuccess("До свидания! Спасибо за использование нашего приложения! 👋")
+            consoleView.displaySuccess(SystemMessages.Success.appExit)
             exit(0)
         default:
-            consoleView.displayError("Неверный выбор. Попробуйте снова.")
+            consoleView.displayError(SystemMessages.Error.invalidChoice)
         }
         
         run()

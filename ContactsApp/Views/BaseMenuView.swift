@@ -40,17 +40,17 @@ class BaseMenuView: MenuViewProtocol {
     }
     
     func waitForEnter() {
-        consoleView.displayInfo("Нажмите Enter для продолжения...")
+        consoleView.displayInfo(SystemMessages.Info.pressEnterToContinue)
     }
     
     func searchAndSelectContact(presenter: ContactPresenterProtocol, action: String) -> Int? {
         let contacts = presenter.getAllContacts()
         if contacts.isEmpty {
-            consoleView.displayInfo("Список контактов пуст. Нажмите Enter для продолжения...")
+            consoleView.displayInfo(SystemMessages.Info.emptyContactList)
             return nil
         }
         
-        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
+        consoleView.menuInfoItem(SystemMessages.UI.backToMenuWithQ)
         consoleView.menuHr()
         
         let query = consoleView.inputString(prompt: "\nВведите поисковый запрос (оставьте пустым для отображения всех контактов): ")
@@ -60,7 +60,7 @@ class BaseMenuView: MenuViewProtocol {
         let filteredContacts = presenter.searchContacts(query, contacts: contacts)
         
         if filteredContacts.isEmpty {
-            consoleView.displayInfo("По запросу '\(query)' ничего не найдено. Нажмите Enter для продолжения...")
+            consoleView.displayInfo(String(format: SystemMessages.Info.noSearchResultsWithEnter, query))
             return nil
         }
         

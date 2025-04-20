@@ -48,7 +48,7 @@ class ProfileMenuView: BaseMenuView, ProfileMenuViewProtocol {
         case "1": showSearchMainContact()
         case "2": router.showMainMenu()
         default:
-            consoleView.displayError("Неверный выбор. Попробуйте снова.")
+            consoleView.displayError(SystemMessages.Error.invalidChoice)
         }
         run()
     }
@@ -64,10 +64,10 @@ class ProfileMenuView: BaseMenuView, ProfileMenuViewProtocol {
         
         if presenter.setMainContact(id: id) {
             if let contact = presenter.getMainContact() {
-                consoleView.displaySuccess("Основной контакт успешно установлен:", description: contact.toStr())
+                consoleView.displaySuccess(SystemMessages.Success.mainContactSet, description: contact.toStr())
             }
         } else {
-            consoleView.displayError("Контакт с ID \(id) не найден")
+            consoleView.displayError(String(format: SystemMessages.Error.contactNotFound, id))
         }
         
         waitForEnter()

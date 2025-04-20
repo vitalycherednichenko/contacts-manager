@@ -75,15 +75,15 @@ class ContactPresenter: ContactPresenterProtocol {
     
     public func editContact(id: Int) -> Bool {
         guard let index = getAllContacts().firstIndex(where: { $0.id == id }) else {
-            consoleView.displayError("Контакт с ID \(id) не найден")
+            consoleView.displayError(String(format: SystemMessages.Error.contactNotFound, id))
             return false
         }
         
         let contact = getAllContacts()[index]
         
         consoleView.menuSubTitle("✏️ Редактирование контакта")
-        consoleView.menuInfoItem("ℹ️  Если хотите оставить поле без изменений, нажмите Enter")
-        consoleView.menuInfoItem("◀️  Если хотите вернутся в меню введите 'q'")
+        consoleView.menuInfoItem(SystemMessages.UI.leaveUnchangedWithEnter)
+        consoleView.menuInfoItem(SystemMessages.UI.backToMenuWithQ)
         consoleView.menuHr()
         
         let namePrompt = "👤 Имя [\(contact.personalInfo.name)]: "
